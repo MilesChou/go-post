@@ -29,3 +29,6 @@ Desktop.ini
 
 # Go Dep files
 /vendor
+
+# Tests database
+/posts.db

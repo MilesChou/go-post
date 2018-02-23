@@ -1,22 +1,17 @@
 package main
 
 import (
-	"os"
-	"github.com/gin-gonic/gin"
+	"github.com/MilesChou/go-post/db"
+	"github.com/MilesChou/go-post/routes"
+	"github.com/MilesChou/go-post/entity"
 )
 
 func main() {
-	os.Chdir(".")
+	gorm := db.Connect()
+	defer gorm.Close()
 
-	server := gin.Default()
-	server.GET(`/ping`, func(g *gin.Context) {
-		s := make([]string, 1)
-		s[0] = `pong`
+	entity.Migrate()
 
-		g.JSON(200, map[string]string{
-			"result": "pong",
-		})
-	})
-
+	server := routes.CreateServer()
 	server.Run()
 }
