@@ -9,15 +9,28 @@ branches:
 env:
 - GIMME_OS=linux GIMME_ARCH=amd64
 - GIMME_OS=darwin GIMME_ARCH=amd64
-- GIMME_OS=windows GIMME_ARCH=amd64
 
 install:
 - go get
 
 script:
-- go build
-- ls -l
+- echo Nothing to do
 
 cache:
   directories:
   - vendor
+
+before_deploy:
+- CGO_ENABLED=1 go build
+- if [[ "$GIMME_OS" == 'linux' ]]; then mv go-post go-post-${GIMME_OS} ; fi
+- if [[ "$GIMME_OS" == 'darwin' ]]; then mv go-post go-post-${GIMME_OS} ; fi
+- ls -l
+
+deploy:
+  provider: releases
+  api_key:
+    secure: hpnTC0FoGzLnSTn71OPqiwZvGNTmgDc8aMvnrgcVnVXxO2wZGBUPgERU2gkUxFouI0CdTCDxmllVdaj2TjG2BPGvM3/IB23aw5SJTBtsr1s/n5+uOKenLZYOUQKbBggZmXzHqNwoJbTpJu0JFqnRCJiDXUK4BOmYYSNQrz0g16SzUOHQPT6dHz8Reux/DC1AsjXGaz+DRw9j8tWvfo+ROWDGOvzEMPqJq6gQPC52qIhP/zlZNlfMwkvfKvFnd62WAaeQGhYZ8SNaQJrvn6BonXd1ePh5E//ZEB75SYHwlvbNeAIPbtx5uWCEtJg4/NNSbvtXbxm8WhpNaMv+Zq9N7BAhXkqXZfs7ZBv9NSsSjRlCFFFphhUSYz9WYMOJ/fiLDotTGAfRv9fXZmQx1xjddQY3mR8IhzyCuxw4p1fLAV0iEU0z6abjYhoaxWSGhd/j2Iq/iMMuCcQHYngcDL76/MDq/8ZVOZieEA/E/EnSHE4xU7JM+fwC3jpeLni6gWSfv33j/m9QfJS3Fn825Wxk/KH3iEMNGK4khruOSC/4B1rUNPx8CtszkB3gLWow7Y4t8Nh21YLH1GMusQrMPQV0rvmdOjz6nvA1LTynaTPBnXxDBVfA8nP3k7PNl3uElQkORldfe/fEdbi6Xq1KzO1ZlmgNj8GydvyUDl83u7mHkAs=
+  file: go-post-${GIMME_OS}
+  skip_cleanup: true
+  on:
+    tags: true
