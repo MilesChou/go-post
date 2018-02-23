@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/MilesChou/go-post/entity"
 	"strconv"
+	"net/http"
 )
 
 func CreateServer() *gin.Engine {
@@ -23,7 +24,14 @@ func CreateServer() *gin.Engine {
 
 		post := entity.CreatePost(name, content)
 
-		c.JSON(200, post)
+		c.JSON(http.StatusOK, gin.H{
+			"id": post.ID,
+			"createdAt": post.CreatedAt,
+			"updatedAt": post.UpdatedAt,
+			"deletedAt": post.DeletedAt,
+			"name": post.Name,
+			"content": post.Content,
+		})
 	})
 
 	server.GET("/posts/:id", func(c *gin.Context) {
@@ -34,7 +42,22 @@ func CreateServer() *gin.Engine {
 
 		post := entity.ReadPost(uint(id))
 
-		c.JSON(200, post)
+		if post.ID == 0 {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "Resource is not found",
+			})
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"id": post.ID,
+			"createdAt": post.CreatedAt,
+			"updatedAt": post.UpdatedAt,
+			"deletedAt": post.DeletedAt,
+			"name": post.Name,
+			"content": post.Content,
+		})
 	})
 
 	return server
